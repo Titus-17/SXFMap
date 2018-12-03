@@ -3,23 +3,23 @@ struct sPassport
 {
 	// General data
 	long			id;
-	unsigned long	passportLength;
-	unsigned long	edition;
-	unsigned long	checkSum;
+	unsigned long		passportLength;
+	unsigned long		edition;
+	unsigned long		checkSum;
 	char 			creationgDate[12];
 	char			nomenclature[32];
-	unsigned long	scale;
+	unsigned long		scale;
 	char			sheetName[32];
 	// Info flags
-	unsigned short 	flag_status 			:2;		// Data status flag
-	unsigned short 	flag_projection 		:1;		// Projection Match flag
-	unsigned short 	flag_realCoordinate		:2;		// Real coordinates flag
-	unsigned short 	flag_codingType 		:2;		// Type of coding flag
-	unsigned short 	flag_generalTable 		:1;		// Generalization table flag
-	unsigned short 	flag_signature 			:2;		// Signature encoding flag
-	unsigned short 	flag_precision 			:1;		// Coordinates precision flag
-	unsigned short 	flag_specSort 			:1;		// Special data sorting flag
-	unsigned short 	flag_reserve			:7;
+	unsigned short 		flag_status 			:2;		// Data status flag
+	unsigned short 		flag_projection 		:1;		// Projection Match flag
+	unsigned short 		flag_realCoordinate		:2;		// Real coordinates flag
+	unsigned short 		flag_codingType 		:2;		// Type of coding flag
+	unsigned short 		flag_generalTable 		:1;		// Generalization table flag
+	unsigned short 		flag_signature 			:2;		// Signature encoding flag
+	unsigned short 		flag_precision 			:1;		// Coordinates precision flag
+	unsigned short 		flag_specSort 			:1;		// Special data sorting flag
+	unsigned short 		flag_reserve			:7;
 	long			classifier;
 	// Rectangular coordinates of sheet corners
 	double			XSouthWestCorner;
