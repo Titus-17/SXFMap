@@ -1,6 +1,6 @@
 //Map.cpp
 #include <iostream>
-#include <fstream>        // read()
+#include <fstream>		// read()
 
 #include "Map.h"
 
@@ -10,129 +10,125 @@ cMap::cMap(){}
 
 int cMap::readPassport(char* filename)
 {
-    ifstream infile;
-    infile.open(filename, ios::binary);
-    if (!infile){
-        cerr << "Unable to read SXF!\n";
-        infile.close();
-        return (-1);
-    }
+	ifstream infile;
+	infile.open(filename, ios::binary);
+	if (!infile){
+		cerr << "Unable to read SXF!\n";
+		infile.close();
+		return (1);
+	}
 
-    // Checking first 2 data fields.                                                            
-    infile.read((char*)(&passport.m_id),    sizeof(long));    // Checking accordance of id to 
-    if (passport.m_id != 4610131){                            // SXF (0x00465853 or 4610131).
-        cerr << "Error! Wrong id.\n";
-        return (-1);
-    }
+	// Checking first 2 data fields.															
+	infile.read((char*)(&m_passport.id),	sizeof(long));	// Checking accordance of id to 
+	if (m_passport.id != 4610131){							// SXF (0x00465853 or 4610131).
+		cerr << "Error! Wrong id.\n";
+		return (2);
+	}
 
-    infile.read((char*)(&passport.m_passportLength),sizeof(long));    // Checking passport 
-    if (passport.m_passportLength != 400){                            // length (v4.0 2008 has
-        cerr << "Error! Wrong passport lenght. Check version.\n";    // 400 bytes)
-        return (-1);
-    }
+	infile.read((char*)(&m_passport.passportLength),sizeof(long));	// Checking passport 
+	if (m_passport.passportLength != 400){							// length (v4.0 2008 has
+		cerr << "Error! Wrong passport length. Check version.\n";	// 400 bytes)
+		return (3);
+	}
+	
+	infile.seekg(0); 
+	infile.read((char*)(&m_passport), m_passport.passportLength);
+	infile.close();
 
-    
-    infile.seekg(0);
-
-    infile.read((char*)(&passport), passport.m_passportLength);
-    writePassportLog("PassportLog.txt");
-
-    infile.close();
-    cout << filename << " was read" << "\n";
-    return 0;
+	cout << filename << " was read" << "\n";
+	return 0;
 }
 
 
 int cMap::writePassportLog(char* filename)
 {
+	ofstream outfile;
+	outfile.open(filename);
+	if (!outfile){	
+		cerr << "Unable to write log file!\n";	
+		outfile.close();
+		return(1);
+	}
 
-    // General data
-    ofstream outfile;
-    outfile.open(filename);
-    if (!outfile){
-        cerr << "Unable to write log file!\n";
-        outfile.close();
-        return(-1);
-    }
+	outfile << 
+	// General data
+	 	hex	<< "id = "					<< m_passport.id					<< "\n"
+	<<	dec	<< "passportLength = "		<< m_passport.passportLength		<< "\n"
+	<<	hex	<< "edition = "				<< m_passport.edition				<< "\n"
+	<<	dec	<< "checkSum = "			<< m_passport.checkSum				<< "\n"
+			<< "creationgDate = "		<< m_passport.creationgDate		 	<< "\n"
+			<< "nomenclature = "		<< m_passport.nomenclature			<< "\n"
+			<< "scale = "				<< m_passport.scale					<< "\n"
+			<< "sheetName = "			<< m_passport.sheetName				<< "\n\n"
+	// Info flags
+			<< "flag_status = "			<< m_passport.flag_status			<< "\n"
+			<< "flag_precision = "		<< m_passport.flag_projection		<< "\n"
+			<< "flag_realCoordinate = "	<< m_passport.flag_realCoordinate	<< "\n"
+			<< "flag_codingType = "		<< m_passport.flag_codingType		<< "\n"
+			<< "flag_generalTable = "	<< m_passport.flag_generalTable		<< "\n"
+			<< "flag_signature = "		<< m_passport.flag_signature		<< "\n"
+			<< "flag_precision = "		<< m_passport.flag_precision		<< "\n"
+			<< "flag_specSort = "		<< m_passport.flag_specSort			<< "\n"
+			<< "flag_reserveFlag = "	<< m_passport.flag_reserve			<< "\n\n"
 
-    outfile << 
-        hex    << "m_id = "                     << passport.m_id                        << "\n"
-    <<    dec    << "m_passportLength = "       << passport.m_passportLength            << "\n"
-    <<    hex    << "m_edition = "              << passport.m_edition                   << "\n"
-    <<    dec    << "m_checkSum = "             << passport.m_checkSum                  << "\n"
-             << "m_creationgDate = "            << passport.m_creationgDate             << "\n"
-             << "m_nomenclature = "             << passport.m_nomenclature              << "\n"
-             << "m_scale = "                    << passport.m_scale                     << "\n"
-             << "m_sheetName = "                << passport.m_sheetName                 << "\n\n"
-    // Info flags
-            << "m_flag_status = "               << passport.m_flag_status               << "\n"
-            << "m_flag_precision = "            << passport.m_flag_projection           << "\n"
-            << "m_flag_realCoordinate = "       << passport.m_flag_realCoordinate       << "\n"
-            << "m_flag_codingType = "           << passport.m_flag_codingType           << "\n"
-            << "m_flag_generalTable = "         << passport.m_flag_generalTable         << "\n"
-            << "m_flag_signature = "            << passport.m_flag_signature            << "\n"
-            << "m_flag_precision = "            << passport.m_flag_precision            << "\n"
-            << "m_flag_specSort = "             << passport.m_flag_specSort             << "\n"
-            << "m_flag_reserveFlag = "          << passport.m_flag_reserve              << "\n\n"
-
-            << "m_classifier = "                << passport.m_classifier                << "\n\n"
-    // Rectangular coordinates of sheet corners
-            << "m_XSouthWestCorner = "          << passport.m_XSouthWestCorner         << "\n"
-            << "m_YSouthWestCorner = "          << passport.m_YSouthWestCorner         << "\n"
-            << "m_XNorthWestCorner = "          << passport.m_XNorthWestCorner         << "\n"
-            << "m_YNorthWestCorner = "          << passport.m_YNorthWestCorner         << "\n"
-            << "m_XNorthEastCorner = "          << passport.m_XNorthEastCorner         << "\n"
-            << "m_YNorthEastCorner = "          << passport.m_YNorthEastCorner         << "\n"
-            << "m_XSouthEastCorner = "          << passport.m_XSouthEastCorner         << "\n"
-            << "m_YSouthEastCorner = "          << passport.m_YSouthEastCorner         << "\n\n"
-    // Geodetic coordinates of sheet corners
-            << "m_BSouthWestCorner = "          << passport.m_BSouthWestCorner          << "\n"
-            << "m_LSouthWestCorner = "          << passport.m_LSouthWestCorner          << "\n"
-            << "m_BNorthWestCorner = "          << passport.m_BNorthWestCorner          << "\n"
-            << "m_LNorthWestCorner = "          << passport.m_LNorthWestCorner          << "\n"
-            << "m_BNorthEastCorner = "          << passport.m_BNorthEastCorner          << "\n"
-            << "m_LNorthEastCorner = "          << passport.m_LNorthEastCorner          << "\n"
-            << "m_BSouthEastCorner = "          << passport.m_BSouthEastCorner          << "\n"
-            << "m_LSouthEastCorner = "          << passport.m_LSouthEastCorner          << "\n\n"
-    // Mathematical basis of sheet
-            << "m_ellipsoidType = "             << passport.m_ellipsoidType             << "\n"
-            << "m_elevationSystem = "           << passport.m_elevationSystem           << "\n"
-            << "m_materialProjection = "        << passport.m_materialProjection        << "\n"
-            << "m_coordinateSystem = "          << passport.m_coordinateSystem          << "\n"
-            << "m_planeUnit = "                 << passport.m_planeUnit                 << "\n"
-            << "m_heightUnit = "                << passport.m_heightUnit                << "\n"
-            << "m_frameType = "                 << passport.m_frameType                 << "\n"
-            << "m_mapType = "                   << passport.m_mapType                   << "\n\n"
-    // Reference data on source material
-            << "m_updateDate = "                << passport.m_updateDate                << "\n"
-            << "m_materialKind = "              << passport.m_materialKind              << "\n"
-            << "m_materialType = "              << passport.m_materialType              << "\n"
-            << "m_reserveRef1 = "               << passport.m_reserveRef1               << "\n"
-            << "m_magneticDeclination = "       << passport.m_magneticDeclination       << "\n"
-            << "m_avgMeridianConv = "           << passport.m_avgMeridianConv           << "\n"
-            << "m_magneticChange = "            << passport.m_magneticChange            << "\n"
-            << "m_declinationUpdt = "           << passport.m_declinationUpdt           << "\n"
-            << "m_reserveRef2 = "               << passport.m_reserveRef2               << "\n"
-            << "m_reliefSection = "             << passport.m_reliefSection             << "\n"
-            << "m_reserve = "                   << passport.m_reserve                   << "\n"
-            << "m_deviceResolution = "          << passport.m_deviceResolution          << "\n\n"
-    // Location of the frame on the device
-            << "m_X_SW_FrameLoacation = "       << passport.m_X_SW_FrameLoacation       << "\n"
-            << "m_Y_SW_FrameLoacation = "       << passport.m_Y_SW_FrameLoacation       << "\n"
-            << "m_X_NW_FrameLoacation = "       << passport.m_X_NW_FrameLoacation       << "\n"
-            << "m_Y_NW_FrameLoacation = "       << passport.m_Y_NW_FrameLoacation       << "\n"
-            << "m_X_NE_FrameLoacation = "       << passport.m_X_NE_FrameLoacation       << "\n"
-            << "m_Y_NE_FrameLoacation = "       << passport.m_Y_NE_FrameLoacation       << "\n"
-            << "m_X_SE_FrameLoacation = "       << passport.m_X_SE_FrameLoacation       << "\n"
-            << "m_Y_SE_FrameLoacation = "       << passport.m_Y_SE_FrameLoacation       << "\n\n"
-    // Reference data on the projection of the source material    
-            << "m_firstMainParallel = "         << passport.m_firstMainParallel         << "\n"
-            << "m_secondMainParallel = "        << passport.m_secondMainParallel        << "\n"
-            << "m_axialMeridian = "             << passport.m_axialMeridian             << "\n"
-            << "m_mainPointParallel = "         << passport.m_mainPointParallel         << "\n"
-            << "m_poleLatitude = "              << passport.m_poleLatitude              << "\n"
-            << "m_poleLongitude = "             << passport.m_poleLongitude             << "\n";
-    outfile.close();
-    cout << "Passport was recored in " << filename << "\n";
-    return 0;
+			<< "classifier = "			<< m_passport.classifier			<< "\n\n"
+	// Rectangular coordinates of sheet corners
+			<< "XSouthWestCorner = "	 << m_passport.XSouthWestCorner		<< "\n"
+			<< "YSouthWestCorner = "	 << m_passport.YSouthWestCorner		<< "\n"
+			<< "XNorthWestCorner = "	 << m_passport.XNorthWestCorner		<< "\n"
+			<< "YNorthWestCorner = "	 << m_passport.YNorthWestCorner		<< "\n"
+			<< "XNorthEastCorner = "	 << m_passport.XNorthEastCorner		<< "\n"
+			<< "YNorthEastCorner = "	 << m_passport.YNorthEastCorner		<< "\n"
+			<< "XSouthEastCorner = "	 << m_passport.XSouthEastCorner		<< "\n"
+			<< "YSouthEastCorner = "	 << m_passport.YSouthEastCorner		<< "\n\n"
+	// Geodetic coordinates of sheet corners
+			<< "BSouthWestCorner = "	<< m_passport.BSouthWestCorner		<< "\n"
+			<< "LSouthWestCorner = "	<< m_passport.LSouthWestCorner		<< "\n"
+			<< "BNorthWestCorner = "	<< m_passport.BNorthWestCorner		<< "\n"
+			<< "LNorthWestCorner = "	<< m_passport.LNorthWestCorner		<< "\n"
+			<< "BNorthEastCorner = "	<< m_passport.BNorthEastCorner		<< "\n"
+			<< "LNorthEastCorner = "	<< m_passport.LNorthEastCorner		<< "\n"
+			<< "BSouthEastCorner = "	<< m_passport.BSouthEastCorner		<< "\n"
+			<< "LSouthEastCorner = "	<< m_passport.LSouthEastCorner		<< "\n\n"
+	// Mathematical basis of sheet
+			<< "ellipsoidType = "		<< m_passport.ellipsoidType			<< "\n"
+			<< "elevationSystem = "		<< m_passport.elevationSystem		<< "\n"
+			<< "materialProjection = "	<< m_passport.materialProjection	<< "\n"
+			<< "coordinateSystem = "	<< m_passport.coordinateSystem		<< "\n"
+			<< "planeUnit = "			<< m_passport.planeUnit				<< "\n"
+			<< "heightUnit = "			<< m_passport.heightUnit			<< "\n"
+			<< "frameType = "			<< m_passport.frameType				<< "\n"
+			<< "mapType = "				<< m_passport.mapType				<< "\n\n"
+	// Reference data on source material
+			<< "updateDate = "			<< m_passport.updateDate			<< "\n"
+			<< "materialKind = "		<< m_passport.materialKind			<< "\n"
+			<< "materialType = "		<< m_passport.materialType			<< "\n"
+			<< "reserveRef1 = "			<< m_passport.reserveRef1			<< "\n"
+			<< "magneticDeclination = "	<< m_passport.magneticDeclination	<< "\n"
+			<< "avgMeridianConv = "		<< m_passport.avgMeridianConv		<< "\n"
+			<< "magneticChange = "		<< m_passport.magneticChange		<< "\n"
+			<< "declinationUpdt = "		<< m_passport.declinationUpdt		<< "\n"
+			<< "reserveRef2 = "			<< m_passport.reserveRef2			<< "\n"
+			<< "reliefSection = "		<< m_passport.reliefSection			<< "\n"
+			<< "reserve = "				<< m_passport.reserve				<< "\n"
+			<< "deviceResolution = "	<< m_passport.deviceResolution		<< "\n\n"
+	// Location of the frame on the device
+			<< "X_SW_FrameLoacation = "	<< m_passport.X_SW_FrameLoacation	<< "\n"
+			<< "Y_SW_FrameLoacation = "	<< m_passport.Y_SW_FrameLoacation	<< "\n"
+			<< "X_NW_FrameLoacation = "	<< m_passport.X_NW_FrameLoacation	<< "\n"
+			<< "Y_NW_FrameLoacation = "	<< m_passport.Y_NW_FrameLoacation	<< "\n"
+			<< "X_NE_FrameLoacation = "	<< m_passport.X_NE_FrameLoacation	<< "\n"
+			<< "Y_NE_FrameLoacation = "	<< m_passport.Y_NE_FrameLoacation	<< "\n"
+			<< "X_SE_FrameLoacation = "	<< m_passport.X_SE_FrameLoacation	<< "\n"
+			<< "Y_SE_FrameLoacation = "	<< m_passport.Y_SE_FrameLoacation	<< "\n\n"
+	// Reference data on the projection of the source material	
+			<< "firstMainParallel = "	<< m_passport.firstMainParallel		<< "\n"
+			<< "secondMainParallel = "	<< m_passport.secondMainParallel	<< "\n"
+			<< "axialMeridian = "		<< m_passport.axialMeridian			<< "\n"
+			<< "mainPointParallel = "	<< m_passport.mainPointParallel		<< "\n"
+			<< "poleLatitude = "		<< m_passport.poleLatitude			<< "\n"
+			<< "poleLongitude = "		<< m_passport.poleLongitude			<< "\n";
+	outfile.close();
+	cout << "Passport was recored in " << filename << "\n";
+	return 0;
 }

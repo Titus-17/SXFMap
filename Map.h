@@ -6,11 +6,11 @@
 class cMap
 {
 private:
-	sPassport passport;
+	sPassport m_passport;
 public:
 	cMap();
-	int readPassport(char*);
-	int writePassportLog(char*);
+	int readPassport(char*);			// Read passport from SXF and save in sPassport
+	int writePassportLog(char*);		// Write 
 };
 
 #endif
