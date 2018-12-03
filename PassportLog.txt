@@ -1,0 +1,76 @@
+m_id = 465853
+m_passportLength = 400
+m_edition = 40000
+m_checkSum = 27223086
+m_creationgDate = 20051115
+m_nomenclature = 0.M-38-33.A
+m_scale = 200000
+m_sheetName = —¬≈“À€… ﬂ–
+
+m_flag_status = 3
+m_flag_precision = 1
+m_flag_realCoordinate = 0
+m_flag_codingType = 0
+m_flag_generalTable = 0
+m_flag_signature = 1
+m_flag_precision = 0
+m_flag_specSort = 0
+m_flag_reserveFlag = 0
+
+m_classifier = 0
+
+m_XSouthWestCorner = 5.31901e+06
+m_YSouthWestCorner = 8.42537e+06
+m_XNorthWestCorner = 5.39314e+06
+m_YNorthWestCorner = 8.42634e+06
+m_XNorthEastCorner = 5.39265e+06
+m_YNorthEastCorner = 8.5e+06
+m_XSouthEastCorner = 5.31852e+06
+m_YSouthEastCorner = 8.5e+06
+
+m_BSouthWestCorner = 0.837758
+m_LSouthWestCorner = 0.767945
+m_BNorthWestCorner = 0.849394
+m_LNorthWestCorner = 0.767945
+m_BNorthEastCorner = 0.849394
+m_LNorthEastCorner = 0.785398
+m_BSouthEastCorner = 0.837758
+m_LSouthEastCorner = 0.785398
+
+m_ellipsoidType = 1
+m_elevationSystem = 1
+m_materialProjection = 1
+m_coordinateSystem = 1
+m_planeUnit = 0
+m_heightUnit = 0
+m_frameType = 2
+m_mapType = 1
+
+m_updateDate = 19850101
+m_materialKind = 1
+m_materialType = 2
+m_reserveRef1 = 
+m_magneticDeclination = 0
+m_avgMeridianConv = 0
+m_magneticChange = 0
+m_declinationUpdt = 
+m_reserveRef2 = 
+m_reliefSection = 20
+m_reserve = 
+m_deviceResolution = 20000
+
+m_X_SW_FrameLoacation = 6400
+m_Y_SW_FrameLoacation = 6399
+m_X_NW_FrameLoacation = 13813
+m_Y_NW_FrameLoacation = 6496
+m_X_NE_FrameLoacation = 13764
+m_Y_NE_FrameLoacation = 13862
+m_X_SE_FrameLoacation = 6351
+m_Y_SE_FrameLoacation = 13862
+
+m_firstMainParallel = 0
+m_secondMainParallel = 0
+m_axialMeridian = 0.771436
+m_mainPointParallel = 0
+m_poleLatitude = 0
+m_poleLongitude = 0
