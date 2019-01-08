@@ -1,16 +1,30 @@
 //Map.h
 #ifndef MAP_H
 #define MAP_H
-#include "PassportNew.h"
+#include "Structs.h"
+#include <fstream>
 
 class cMap
 {
 private:
-	sPassport m_passport;
+	char*			m_ptr_charMap;		// Массив для сырой битовой карты
+	sPassport*		m_ptr_passport;		// Указатель на пасспорт в битовой карте
+	sDescriptor* 	m_ptr_descriptor;	// Указатель на дескриптор в битовой карте
+	sRecord*		m_ptr_records;		// Массив записей
 public:
 	cMap();
-	int readPassport(char*);			// Read passport from SXF and save in sPassport
-	int writePassportLog(char*);		// Write 
+	~cMap();
+	// Прочитать карту в битовом режиме и сохранить в m_ptr_charMap 
+	short readSXF(char* p_filename); 
+
+	void setPointers();					// Установить указатели на объекты в битовой карте 
+	// Прочитать одну запись. p_recordNo - номер записи, p_bufPosition байт, после которого записана карта
+	void readOneRecordMetric(long &p_recordNo, unsigned long &p_bufPosition);
+
+	short writePassportLog(char* p_ptr_filename);		// Записать лог данных паспорта в файл
+	short writeDescriptorLog(char* p_ptr_filename);		// Записать лог данных дескриптора в файл
+	short writeHeadersLog(char* p_ptr_filename);		// Записать лог данных заголовков в файл
+	short writeRecordMetricLog(char* p_ptr_filename);	// Записать лог данных метрик в файл
 };
 
 #endif
