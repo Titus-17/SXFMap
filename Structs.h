@@ -7,29 +7,29 @@
 #pragma pack (push, 1)
 struct sPassport	// 400 Bytes
 {
-	// General data
-	long			id;
-	unsigned long	length;
-	unsigned long	edition;
-	unsigned long	checkSum;
-	char 			creationgDate[12];
-	char			nomenclature[32];
-	unsigned long	scale;
-	char			sheetName[32];
+	// Общие данные
+	long			id;								// Идентификатор файла
+	unsigned long	length;							// Длина паспорта в байтах
+	unsigned long	edition;						// Редакция формата
+	unsigned long	checkSum;						// Контрольная сумма
+	char 			creationgDate[12];				// Дата создания набора данных
+	char			nomenclature[32];				// Номенклатура листа
+	unsigned long	scale;							// Масштаб
+	char			sheetName[32];					// Условное название листа
 
-	// Info flags
-	unsigned char 	flag_status 			:2;		// Data status flag
-	unsigned char 	flag_projection 		:1;		// Projection Match flag
-	unsigned char 	flag_realCoordinate		:2;		// Real coordinates flag
-	unsigned char 	flag_codingType 		:2;		// Type of coding flag
-	unsigned char 	flag_generalTable 		:1;		// Generalization table flag
-	unsigned char 	flag_signature;					// Signature encoding flag
-	unsigned char 	flag_precision;					// Coordinates precision flag
-	unsigned char 	flag_specSort 			:1;		// Special data sorting flag
-	unsigned char 	flag_reserve			:7;
+	// Информационные флаги
+	unsigned char 	flag_status 			:2;		// Флаг состояния данных
+	unsigned char 	flag_projection 		:1;		// Флаг соответствия проекции
+	unsigned char 	flag_realCoordinate		:2;		// Флаг наличия реальных координат                
+	unsigned char 	flag_codingType 		:2;		// Флаг способа кодирования
+	unsigned char 	flag_generalTable 		:1;		// Таблица генерализации    
+	unsigned char 	flag_signature;					// Флаг кодировки подписи 
+	unsigned char 	flag_precision;					// Флаг точности координат
+	unsigned char 	flag_specSort 			:1;		// Признак специальной сортировки данных
+	unsigned char 	flag_reserve			:7;		// Резерв
 	long			classifier;
 
-	// Rectangular coordinates of sheet corners
+	// Прямоугольные координаты углов листа
 	double			XSouthWestCorner;
 	double			YSouthWestCorner;
 	double			XNorthWestCorner;
@@ -39,7 +39,7 @@ struct sPassport	// 400 Bytes
 	double			XSouthEastCorner;
 	double			YSouthEastCorner;
 
-	// // Geodetic coordinates of sheet corners
+	// Геодезические координаты углов листа:            
 	double			BSouthWestCorner;
 	double			LSouthWestCorner;
 	double			BNorthWestCorner;
@@ -49,49 +49,51 @@ struct sPassport	// 400 Bytes
 	double			BSouthEastCorner;
 	double			LSouthEastCorner;
 
-	// Mathematical basis of sheet
-	unsigned char	ellipsoidType;
-	unsigned char	elevationSystem;
-	unsigned char 	materialProjection;
-	unsigned char	coordinateSystem;
-	unsigned char	planeUnit;						// Measure unit of plane
-	unsigned char	heightUnit;						// Measure unit of elevation
-	unsigned char	frameType;
-	unsigned char	mapType;
+	// Математическая основа листа
+	unsigned char	ellipsoidType;					// Вид эллипсоида
+	unsigned char	elevationSystem;				// Система высот
+	unsigned char 	materialProjection;				// Проекция исходного мат. 
+	unsigned char	coordinateSystem;				// Система координат 
+	unsigned char	planeUnit;						// Единица измерения в плане
+	unsigned char	heightUnit;						// Единица измерения по высоте                  
+	unsigned char	frameType;						// Вид рамки
+	unsigned char	mapType;						// Обобщенный тип карты 
 
-	// // Reference data on source material
-	char			updateDate[12];
-	unsigned char	materialKind;
-	unsigned char	materialType;
-	char			reserveRef1[2];
-	double			magneticDeclination;
-	double			avgMeridianConv;				// Average meridians conversation
-	double			magneticChange;					// Magnetic change per year
-	char			declinationUpdt[12];			// Declination update date
-	char			reserveRef2[4];
-	double	 		reliefSection;	
-	char			reserve[8];
+	// Справочные данные по исходному материалу
+	char			updateDate[12];					// Дaтa съемки местности или обновления карты    
 
-	long			deviceResolution;
+	unsigned char	materialKind;					// Вид исходного материала
+	unsigned char	materialType;					// Тип исходного матеpиaлa
+	char			reserveRef1[2];					// Резерв
+	double			magneticDeclination;			// Мaгнитное склонение
+	double			avgMeridianConv;				// Сpеднее сближение меpидиaнов               
+	double			magneticChange;					// Годовое изменение магнитного склонения     
+	char			declinationUpdt[12];			// Дата измерения склонения
+	char			reserveRef2[4];					// Резеpв 
+	double	 		reliefSection;					// Высотa сечения pельефa 
+	char			reserve[8];						// Резерв
 
-	// Location of the frame on the device
-	long			X_SW_FrameLoacation;			// X South-West frame location
-	long			Y_SW_FrameLoacation;			// Y South-West frame location
-	long			X_NW_FrameLoacation;			// X North-West frame location
-	long			Y_NW_FrameLoacation;			// Y North-West frame location
-	long			X_NE_FrameLoacation;			// X North-East frame location
-	long			Y_NE_FrameLoacation;			// X North-East frame location
-	long			X_SE_FrameLoacation;			// X South-East frame location
-	long			Y_SE_FrameLoacation;			// X South-East frame location
-	long 			classifierCode;
+	long			deviceResolution;				// Разрешающая способность прибора
 
-	// Reference data on the projection of the source material	
-	double			firstMainParallel;
-	double			secondMainParallel;
-	double			axialMeridian;
-	double			mainPointParallel;
-	double			poleLatitude;
-	double 			poleLongitude;
+	// Расположение рамки на приборе
+	long			X_SW_FrameLoacation;			//
+	long			Y_SW_FrameLoacation;			//
+	long			X_NW_FrameLoacation;			//
+	long			Y_NW_FrameLoacation;			//
+	long			X_NE_FrameLoacation;			//
+	long			Y_NE_FrameLoacation;			//
+	long			X_SE_FrameLoacation;			//
+	long			Y_SE_FrameLoacation;			//
+
+	long 			classifierCode; 				// Классификационный код рамки объекта              
+
+	// Справочные данные по проекции исходного материала
+	double			firstMainParallel;				// Пеpвaя глaвнaя пapaллель 
+	double			secondMainParallel;				// Втоpaя глaвнaя пapaллель    
+	double			axialMeridian;					// Осевой меpидиaн
+	double			mainPointParallel;				// Пapaллель главной точки
+	double			poleLatitude;					// Широта полюса
+	double 			poleLongitude;					// Долгота полюса
 };
 #pragma pack (pop)
 ////////////////////////////////////////////////////////////////////
@@ -101,22 +103,22 @@ struct sPassport	// 400 Bytes
 #pragma pack (push, 1)
 struct sDescriptor	// 52 Bytes
 {	
-	long 			id;
-	unsigned long	length;
-	char			nomenclature[32];
-	long 			recordCount;
+	long 			id;								// Идентификатор начала записи
+	unsigned long	length;							// Длина дескриптора = 52
+	char			nomenclature[32];				// Номенклатура листа
+	long 			recordCount;					// Число записей данных
 	// Info flags
-	unsigned char 	flag_status 			:2;		// Data status flag
-	unsigned char 	flag_projection 		:1;		// Projection Match flag
-	unsigned char 	flag_realCoordinate		:2;		// Real coordinates flag
-	unsigned char 	flag_codingType 		:2;		// Type of coding flag
-	unsigned char 	flag_generalTable 		:1;		// Generalization table flag
+	unsigned char 	flag_status 			:2;		// Флаг состояния данных
+	unsigned char 	flag_projection 		:1;		// Флаг соответствия проекции
+	unsigned char 	flag_realCoordinate		:2;		// Флаг наличия реальных координат
+	unsigned char 	flag_codingType 		:2;		// Флаг способа кодирования
+	unsigned char 	flag_generalTable 		:1;		// Таблица генерализации
 
-	unsigned char	flag_signature;					// Signature encoding flag
-	unsigned short 	flag_reserve;
+	unsigned char	flag_signature;					// Флаг кодирования подписей
+	unsigned short 	flag_reserve;					// Резерв
 
-	unsigned short	objectsClassifier;	
-	unsigned short	semanticsClassifier;
+	unsigned short	objectsClassifier;				// Классификатор объектов
+	unsigned short	semanticsClassifier;			// Классификатор семантики
 };
 #pragma pack (pop)
 ///////////////////////////////////////////////////////////////////
@@ -126,37 +128,37 @@ struct sDescriptor	// 52 Bytes
 #pragma pack (push, 1)
 struct sHeader		// 32 Bytes
 {
-	long			id;
-	unsigned long	length;
-	unsigned long 	metricLenght;
-	long 			classificationCode;
+	long			id;								// Идентификатор начала записи
+	unsigned long	length;							// Общая длина записи с заголовком
+	unsigned long 	metricLenght;					// Длина метрики
+	long 			classificationCode;				// Классификационный код
 
-	unsigned short	numberInGroup;
-	unsigned short	groupNumber;
+	unsigned short	numberInGroup;					// Номер в группе
+	unsigned short	groupNumber;					// Номер группы
 
-	unsigned short	flag_localization			:4;
-	unsigned short	flag_frameExit				:4;
-	unsigned short	flag_insularity				:1;
-	unsigned short	flag_semantics				:1;
-	unsigned short	flag_metricSize				:1;
-	unsigned short	flag_bindingVector			:1;
-	unsigned short	flag_UNICODE				:1;
-	unsigned short	flag_reserve				:3;
+	unsigned short	flag_localization			:4;	// Характер локализации
+	unsigned short	flag_frameExit				:4; // Выход за рамки
+	unsigned short	flag_insularity				:1;	// Признак замкнутости
+	unsigned short	flag_semantics				:1;	// Наличие семантики
+	unsigned short	flag_metricSize				:1; // Размер элемента метрики
+	unsigned short	flag_bindingVector			:1; // Наличие вектора привязки
+	unsigned short	flag_UNICODE				:1; // Признак текста в UNICODE
+	unsigned short	flag_reserve				:3; // Резерв
 	
-	unsigned short	flag_metricFormat			:1;
-	unsigned short	flag_dimension				:1;
-	unsigned short	flag_metricType				:1;
-	unsigned short	flag_metricText				:1;
-	unsigned short	flag_sign					:1;
-	unsigned short	flag_scalableGraphics		:1;
-	unsigned short	flag_metricSpline			:2;
+	unsigned short	flag_metricFormat			:1; // Формат записи метрики
+	unsigned short	flag_dimension				:1; // Размерность представления
+	unsigned short	flag_metricType				:1; // Тип элемента метрики
+	unsigned short	flag_metricText				:1; // Признак метрики с текстом
+	unsigned short	flag_sign					:1; // Наличие графики (знака)
+	unsigned short	flag_scalableGraphics		:1; // Масштабируемость графики
+	unsigned short	flag_metricSpline			:2; // Признак построения сплайна по метрике
 
-	unsigned short	bottomBorder		:4;
-	unsigned short	topBorder 			:4;
+	unsigned short	bottomBorder		:4;			// Нижняя граница видимости
+	unsigned short	topBorder 			:4;			// Верхняя граница видимости
 
-	unsigned long 	metricPointsCountBig;
-	unsigned short 	subobjectNumber;
-	unsigned short 	metricPointsCount;
+	unsigned long 	metricPointsCountBig;			// Число точек метрики для больших объектов
+	unsigned short 	subobjectCount;				// Число подобъектов 
+	unsigned short 	metricPointsCount;				// Число точек метрики
 };
 #pragma pack (pop)
 ///////////////////////////////////////////////////////////////////
@@ -180,15 +182,16 @@ struct s3dPoint : s2dPoint<TypeXY>
 };
 
 
-
+enum 	metricTypes {	mType_2dShort, mType_2dLong, mType_2dFloat, mType_2dDouble,
+ 						mType_3dShort, mType_3dLong, mType_3dFloat, mType_3dDouble};
 ///////////////////////////////////////////////////////////////////
 struct sRecord
 {
 	sHeader*	header;
+	metricTypes	pointsType;
 	void*		points;
 	void**		subobjectPoints;
 
-	// void** 		subPoints; 
 
 	bool is2dPoint()	// Определение размерности метрики (2D/3D)
 	{

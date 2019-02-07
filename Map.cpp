@@ -34,6 +34,43 @@ short cMap::readSXF(char* p_filename)
 }
 /////////////////////////////////////////////////////////////////////
 
+void cMap::setPointsType(long i)
+{
+	if (m_ptr_records[i].is2dPoint())				// Определение размерности метрики (2D/3D)
+	{
+		if (m_ptr_records[i].isInteger())			// Определение типа данных метрика (Целое/Плав.т.)
+		{						
+			if(m_ptr_records[i].isShortSize())		// Определение длины типа данных (2-4 B/4-8 B)
+				m_ptr_records[i].pointsType = mType_2dShort;
+			else									// long
+				m_ptr_records[i].pointsType = mType_2dLong;
+		}
+		else 										// Формат плавающей точки
+		{
+			if(m_ptr_records[i].isShortSize())		// float
+				m_ptr_records[i].pointsType = mType_2dFloat;
+			else 									// double
+				m_ptr_records[i].pointsType = mType_2dDouble;
+		}
+	}
+	else 											// Метрика в 3D
+	{
+		if (m_ptr_records[i].isInteger())			// Целый тип
+		{
+			if(m_ptr_records[i].isShortSize())		// short/float, где float - высота
+				m_ptr_records[i].pointsType = mType_3dShort;
+			else 									// long/float
+				m_ptr_records[i].pointsType = mType_3dLong;
+		}
+		else 										// Плавающая точка
+		{
+			if(m_ptr_records[i].isShortSize())		// float/float
+				m_ptr_records[i].pointsType = mType_3dFloat;
+			else 									// double/double
+				m_ptr_records[i].pointsType = mType_3dDouble;
+		}
+	}
+}
 
 
 /////////////////////////////////////////////////////////////////////
@@ -60,16 +97,18 @@ void cMap::setPointers()
 	{
 		m_ptr_records[i].header = reinterpret_cast<sHeader*>	(m_ptr_charMap + ul_bufPosition);
 		m_ptr_records[i].points = 								(m_ptr_charMap + ul_bufPosition + sizeof(sHeader));
+		setPointsType(i); 		// Определям тип точек
 
-		if (m_ptr_records[i].header->subobjectNumber >= 1 )
+		if (m_ptr_records[i].header->subobjectCount > 0)	// Ищем подобъекты если они есть
 		{
-			unsigned short* pCount = reinterpret_cast<unsigned short*>(m_ptr_charMap + ul_bufPosition + sizeof(sHeader) + m_ptr_records[i].header->metricLenght + sizeof(short));
-			// dec2bin(*pCount);
-			if (*pCount == 32767)	// Если в записи аномальное количство подобоекотов - 
-			{						// будем считать что там нет подобобъектов
-				m_ptr_records[i].header->subobjectNumber = 0;
+			unsigned long ul_bufPosition4SO = 0;
+			cout << "subObjectCount = " << m_ptr_records[i].header->subobjectCount << "\n";
+			for (int j = 0; j < m_ptr_records[i].header->subobjectCount; j++)
+			{
+				cout << "subObject #" << j << "\n";
+				unsigned short* pCount = reinterpret_cast<unsigned short*>(m_ptr_charMap + ul_bufPosition + sizeof(sHeader) + m_ptr_records[i].header->metricPointsCount*2*sizeof(float) + sizeof(short));
+				cout << "Points count = " << *pCount << "\n";
 			}
-
 		}
 		// Увеличваем счетчик интерпретированных байт на размер размер записи
 		ul_bufPosition += m_ptr_records[i].header->length;	
@@ -77,11 +116,12 @@ void cMap::setPointers()
 	cout << "Pointers was setted\n";
 }
 /////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////
 void cMap::readOneRecordMetric(long &p_recordNo, unsigned long &p_bufPosition)
 {
-
-
-	if (m_ptr_records[p_recordNo].header->subobjectNumber >= 1 )
+	if (m_ptr_records[p_recordNo].header->subobjectCount >= 1 )
 	{
 		unsigned short* pCount = reinterpret_cast<unsigned short*>(m_ptr_charMap + p_bufPosition + sizeof(sHeader) + m_ptr_records[p_recordNo].header->metricLenght + sizeof(short));
 		// dec2bin(*pCount);
@@ -92,7 +132,7 @@ void cMap::readOneRecordMetric(long &p_recordNo, unsigned long &p_bufPosition)
 /////////////////////////////////////////////////////////////////////
 
 
-
+/////////////////////////////////////////////////////////////////////
 short cMap::writePassportLog(char* p_ptr_filename)
 {
 	ofstream outfile;
@@ -267,7 +307,7 @@ short cMap::writeHeadersLog(char* p_ptr_filename)
 			<< "topBorder = "				<< m_ptr_records[i].header->topBorder			<< "\n\n"
 
 			<< "metricPointsCountBig = "	<< m_ptr_records[i].header->metricPointsCountBig<< "\n"
-			<< "subobjectNumber = "			<< m_ptr_records[i].header->subobjectNumber		<< "\n"
+			<< "subobjectNumber = "			<< m_ptr_records[i].header->subobjectCount		<< "\n"
 			<< "metricPointsCount = "		<< m_ptr_records[i].header->metricPointsCount	<< "\n\n";
 	}
 	cout << "Headers was recored in " << p_ptr_filename << "\n";
@@ -288,8 +328,9 @@ short cMap::writeRecordMetricLog(char* p_ptr_filename)
 
 	for(unsigned long i = 0; i < m_ptr_descriptor->recordCount; i++) // Цикл по всем записям
 	{
+		// Определение количетва точек в записи: обычное или большое число точек?
 		unsigned long pointsCount;
-		if (m_ptr_records[i].header->metricPointsCount < 65535)		// Определение количетва точек в записи
+		if (m_ptr_records[i].header->metricPointsCount < 65535)		
 			pointsCount = m_ptr_records[i].header->metricPointsCount;
 		else
 			pointsCount = m_ptr_records[i].header->metricPointsCountBig;
@@ -302,6 +343,7 @@ short cMap::writeRecordMetricLog(char* p_ptr_filename)
 			{						
 				if(m_ptr_records[i].isShortSize())				// Определение длины типа данных (2-4 B/4-8 B)
 				{
+					//Заменить на функцию!
 					s2dPoint<short>* tmpPoints = reinterpret_cast<s2dPoint<short>*>(m_ptr_records[i].points);
 					for (unsigned long j = 0; j < pointsCount; j++)
 					{
