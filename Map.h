@@ -29,6 +29,15 @@ private:
 	s3dPoint<long, float>**		m_p3d_Long;
 	s3dPoint<float, float>**	m_p3d_Float;
 	s3dPoint<double, double>**	m_p3d_Double;
+	// Массивы указателей на метрики подобъектов
+	s2dSubObj	<s2dPoint<short>**>				m_p2d_ShortSO;
+	s2dSubObj	<s2dPoint<long>**> 				m_p2d_LongSO;
+	s2dSubObj	<s2dPoint<float>**>				m_p2d_FLoatSO;
+	s2dSubObj	<s2dPoint<double>**>			m_p2d_DoubleSO;
+	s2dSubObj	<s2dPoint<short, float>**> 		m_p3d_ShortSO;
+	s2dSubObj	<s2dPoint<long, float>**>		m_p2d_LongSO;
+	s2dSubObj	<s2dPoint<float, float>**> 		m_p2d_FLoatSO;
+	s2dSubObj	<s2dPoint<double, double>**>	m_p2d_DoubleSO;
 public:
 	cMap();
 	~cMap();

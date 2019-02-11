@@ -280,43 +280,43 @@ void cMap::setPointers()
 		}
 
 
-		if (m_ptr_records[i].header->subobjectCount > 0)	// Ищем подобъекты если они есть
-		{
-			cout << "======Record #" << i << "======\n";
-			// Вылеляем место под subobjectCount указателей:
-			m_ptr_records[i].subobjectPoints = new void*[m_ptr_records[i].header->subobjectCount];
-			 // Определям размер точки (в байтах)
-			short pointsSize = getPointsSize(i);
+		// if (m_ptr_records[i].header->subobjectCount > 0)	// Ищем подобъекты если они есть
+		// {
+		// 	cout << "======Record #" << i << "======\n";
+		// 	// Вылеляем место под subobjectCount указателей:
+		// 	m_ptr_records[i].subobjectPoints = new void*[m_ptr_records[i].header->subobjectCount];
+		// 	 // Определям размер точки (в байтах)
+		// 	short pointsSize = getPointsSize(i);
 
-			// cout << "subObjectCount = " << m_ptr_records[i].header->subobjectCount << "\n";
-			// Сумма размеров метрик подобъектов которые уже интерпретированы как точки:
-			unsigned long subPosition = 0; 
-			for (int j = 0; j < m_ptr_records[i].header->subobjectCount; j++)
-			{
-				cout << "subObject #" << j << "\n";
-				// указатель на служебное поле, содержащее количество точек подобъекта:				
-				unsigned short* pCount = reinterpret_cast<unsigned short*>
-				(	m_ptr_charMap +		// Указатель на массив с бинарной картой
-					currentPosition + 	// Количество байт, которое уже было прочитано до текущей записи
-					sizeof(sHeader) + 	// Размер заголовка, с которого начиается запись 
-					m_ptr_records[i].header->metricPointsCount*pointsSize +	// Размер метрики записи
-					sizeof(short) + 	// Служебное поле с резервом, которое находится после метрики
-					subPosition);		// Сумма размеров метрик уже пройденных подобъектов
+		// 	// cout << "subObjectCount = " << m_ptr_records[i].header->subobjectCount << "\n";
+		// 	// Сумма размеров метрик подобъектов которые уже интерпретированы как точки:
+		// 	unsigned long subPosition = 0; 
+		// 	for (int j = 0; j < m_ptr_records[i].header->subobjectCount; j++)
+		// 	{
+		// 		cout << "subObject #" << j << "\n";
+		// 		// указатель на служебное поле, содержащее количество точек подобъекта:				
+		// 		unsigned short* pCount = reinterpret_cast<unsigned short*>
+		// 		(	m_ptr_charMap +		// Указатель на массив с бинарной картой
+		// 			currentPosition + 	// Количество байт, которое уже было прочитано до текущей записи
+		// 			sizeof(sHeader) + 	// Размер заголовка, с которого начиается запись 
+		// 			m_ptr_records[i].header->metricPointsCount*pointsSize +	// Размер метрики записи
+		// 			sizeof(short) + 	// Служебное поле с резервом, которое находится после метрики
+		// 			subPosition);		// Сумма размеров метрик уже пройденных подобъектов
 
-				m_ptr_records[i].subobjectPoints[j] = reinterpret_cast<unsigned short*>
-				(	m_ptr_charMap + 
-				 	currentPosition +
-				 	sizeof(sHeader) +
-				 	m_ptr_records[i].header->metricPointsCount*2*sizeof(float) +
-				 	2*sizeof(short) +	// Служебное поле с резервом + поле с количеством точек
-				 	subPosition);
+		// 		m_ptr_records[i].subobjectPoints[j] = reinterpret_cast<unsigned short*>
+		// 		(	m_ptr_charMap + 
+		// 		 	currentPosition +
+		// 		 	sizeof(sHeader) +
+		// 		 	m_ptr_records[i].header->metricPointsCount*2*sizeof(float) +
+		// 		 	2*sizeof(short) +	// Служебное поле с резервом + поле с количеством точек
+		// 		 	subPosition);
 
-				cout << "Points count = " << *pCount << "\n";
+		// 		cout << "Points count = " << *pCount << "\n";
 
-				// Увеличиваем сетчик на размер всех точек подобъекта + 2 служебных поля с данными о количестве точек
-				subPosition += pointsSize * (*pCount) + 2*sizeof(short); 
-			}
-		}
+		// 		// Увеличиваем сетчик на размер всех точек подобъекта + 2 служебных поля с данными о количестве точек
+		// 		subPosition += pointsSize * (*pCount) + 2*sizeof(short); 
+		// 	}
+		// }
 		// Увеличваем счетчик интерпретированных байт на размер размер записи
 		currentPosition += m_ptr_headers[i]->length;	
 	}

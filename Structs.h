@@ -183,38 +183,13 @@ struct s3dPoint : s2dPoint<TypeXY>
 
 
 
-///////////////////////////////////////////////////////////////////
-struct sRecord
+template<class pointType>
+struct s2dSubObj
 {
-	sHeader*	header;
-	metricTypes	pointsType;
-	void*		points;
-	void**		subobjectPoints;
-
-
-	bool is2dPoint()	// Определение размерности метрики (2D/3D)
-	{
-		if (header->flag_dimension == 0)
-			return true;
-		else
-			return false;
-	}
-	bool isInteger()	// Определение типа метрики
-	{
-		if (header->flag_metricType == 0)
-			return true;
-		else
-			return false;
-	}
-	bool isShortSize()	// Определение длины метрики
-	{
-		if(header->flag_metricSize == 0)
-			return true;
-		else
-			return false;
-	}
+	short* pointsCount;			// Массив с количеством точек для каждого подобъекта
+	short recordNum;			// Номер объекта к которому относится подобъект
+	pointType p2d_Short;		// Массив указателей на метрику подобъекта
 };
-///////////////////////////////////////////////////////////////////
 
 // enum 	metricTypes {	mType_2dShort, mType_2dLong, mType_2dFloat, mType_2dDouble,
 //  						mType_3dShort, mType_3dLong, mType_3dFloat, mType_3dDouble};
