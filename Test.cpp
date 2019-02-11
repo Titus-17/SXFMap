@@ -7,6 +7,14 @@ enum 	metricTypes {	mType_2dShort, mType_2dLong, mType_2dFloat, mType_2dDouble,
 
 int main()
 {
-	metricTypes Type = mType_3dDouble;
-	cout << Type << "\n";
+	int mas[10];
+	for (int i = 0; i < 10;)
+	{
+		mas[i++] = i;
+
+	}
+	for (int i = 0; i < 10; i ++)
+	{
+		cout << mas[i] << "\n";
+	}
 }    

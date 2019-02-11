@@ -12,6 +12,9 @@ int main()
 	cMap Map;
 	if(!Map.readSXF("M3833.SXF"))
 		return 1;
+	Map.calcPointsCount();
+	Map.AllocMem4Points();
+	Map.showPCounts();
 	Map.setPointers();
 
 	Map.writePassportLog("PassportLog.txt");
@@ -19,7 +22,7 @@ int main()
 	Map.writeHeadersLog("HeadersLog.txt");
 	Map.writeRecordMetricLog("MetricLog.txt");
 	// system("pause");
-	// Map.~Map();
+	Map.~Map();
     unsigned int end_time = clock(); // конечное время
     std::cout << "Time = " << end_time - start_time << "\n"; // искомое время
 	return 0;

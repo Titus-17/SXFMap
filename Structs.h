@@ -18,15 +18,15 @@ struct sPassport	// 400 Bytes
 	char			sheetName[32];					// Условное название листа
 
 	// Информационные флаги
-	unsigned char 	flag_status 			:2;		// Флаг состояния данных
-	unsigned char 	flag_projection 		:1;		// Флаг соответствия проекции
-	unsigned char 	flag_realCoordinate		:2;		// Флаг наличия реальных координат                
-	unsigned char 	flag_codingType 		:2;		// Флаг способа кодирования
-	unsigned char 	flag_generalTable 		:1;		// Таблица генерализации    
+	unsigned char 	flag_status 				:2;	// Флаг состояния данных
+	unsigned char 	flag_projection 			:1;	// Флаг соответствия проекции
+	unsigned char 	flag_realCoordinate			:2;	// Флаг наличия реальных координат                
+	unsigned char 	flag_codingType 			:2;	// Флаг способа кодирования
+	unsigned char 	flag_generalTable 			:1;	// Таблица генерализации    
 	unsigned char 	flag_signature;					// Флаг кодировки подписи 
 	unsigned char 	flag_precision;					// Флаг точности координат
-	unsigned char 	flag_specSort 			:1;		// Признак специальной сортировки данных
-	unsigned char 	flag_reserve			:7;		// Резерв
+	unsigned char 	flag_specSort 				:1;	// Признак специальной сортировки данных
+	unsigned char 	flag_reserve				:7;	// Резерв
 	long			classifier;
 
 	// Прямоугольные координаты углов листа
@@ -108,11 +108,11 @@ struct sDescriptor	// 52 Bytes
 	char			nomenclature[32];				// Номенклатура листа
 	long 			recordCount;					// Число записей данных
 	// Info flags
-	unsigned char 	flag_status 			:2;		// Флаг состояния данных
-	unsigned char 	flag_projection 		:1;		// Флаг соответствия проекции
-	unsigned char 	flag_realCoordinate		:2;		// Флаг наличия реальных координат
-	unsigned char 	flag_codingType 		:2;		// Флаг способа кодирования
-	unsigned char 	flag_generalTable 		:1;		// Таблица генерализации
+	unsigned char 	flag_status 				:2;	// Флаг состояния данных
+	unsigned char 	flag_projection 			:1;	// Флаг соответствия проекции
+	unsigned char 	flag_realCoordinate			:2;	// Флаг наличия реальных координат
+	unsigned char 	flag_codingType 			:2;	// Флаг способа кодирования
+	unsigned char 	flag_generalTable 			:1;	// Таблица генерализации
 
 	unsigned char	flag_signature;					// Флаг кодирования подписей
 	unsigned short 	flag_reserve;					// Резерв
@@ -153,11 +153,11 @@ struct sHeader		// 32 Bytes
 	unsigned short	flag_scalableGraphics		:1; // Масштабируемость графики
 	unsigned short	flag_metricSpline			:2; // Признак построения сплайна по метрике
 
-	unsigned short	bottomBorder		:4;			// Нижняя граница видимости
-	unsigned short	topBorder 			:4;			// Верхняя граница видимости
+	unsigned short	bottomBorder				:4;	// Нижняя граница видимости
+	unsigned short	topBorder 					:4;	// Верхняя граница видимости
 
 	unsigned long 	metricPointsCountBig;			// Число точек метрики для больших объектов
-	unsigned short 	subobjectCount;				// Число подобъектов 
+	unsigned short 	subobjectCount;					// Число подобъектов 
 	unsigned short 	metricPointsCount;				// Число точек метрики
 };
 #pragma pack (pop)
@@ -182,8 +182,7 @@ struct s3dPoint : s2dPoint<TypeXY>
 };
 
 
-enum 	metricTypes {	mType_2dShort, mType_2dLong, mType_2dFloat, mType_2dDouble,
- 						mType_3dShort, mType_3dLong, mType_3dFloat, mType_3dDouble};
+
 ///////////////////////////////////////////////////////////////////
 struct sRecord
 {
@@ -217,5 +216,6 @@ struct sRecord
 };
 ///////////////////////////////////////////////////////////////////
 
-
+// enum 	metricTypes {	mType_2dShort, mType_2dLong, mType_2dFloat, mType_2dDouble,
+//  						mType_3dShort, mType_3dLong, mType_3dFloat, mType_3dDouble};
 #endif

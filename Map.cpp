@@ -4,12 +4,71 @@
 
 using namespace std;
 
-cMap::cMap():m_ptr_charMap(NULL), m_ptr_passport(NULL), m_ptr_descriptor(NULL), m_ptr_records(NULL){}
+cMap::cMap()
+{
+	m_ptr_charMap 		= NULL;
+	m_ptr_passport 		= NULL;
+	m_ptr_descriptor 	= NULL;
+
+	m_p2d_ShortCount	= 0;
+	m_p2d_LongCount		= 0;
+	m_p2d_FloatCount	= 0;
+	m_p2d_DoubleCount	= 0;
+	m_p3d_ShortCount	= 0;
+	m_p3d_LongCount		= 0;
+	m_p3d_FloatCount	= 0;
+	m_p3d_DoubleCount	= 0;
+
+	m_p2d_Short 		= NULL;
+	m_p2d_Long 			= NULL;
+	m_p2d_Float 		= NULL;
+	m_p2d_Double 		= NULL;
+	m_p3d_Short 		= NULL;
+	m_p3d_Long 			= NULL;
+	m_p3d_Float 		= NULL;
+	m_p3d_Double 		= NULL;
+}
 /////////////////////////////////////////////////////////////////////
 cMap::~cMap()
 {
-	delete[] m_ptr_charMap;
-	delete[] m_ptr_records;
+	// m_ptr_passport 		= NULL;
+	// m_ptr_descriptor 	= NULL;
+	// m_ptr_records 		= NULL;
+
+	// m_p2d_Short 			= NULL;
+	// m_p2d_Long 			= NULL;
+	// m_p2d_Float 			= NULL;
+	// m_p2d_Double 		= NULL;
+	// m_p3d_Short 			= NULL;
+	// m_p3d_Long 			= NULL;
+	// m_p3d_Float 			= NULL;
+	// m_p3d_Double 		= NULL;
+
+	// if (m_ptr_charMap != NULL)
+	// {
+	// 	delete[] m_ptr_charMap;
+	// 	cout << "Proc\n";
+	// }
+	// if (m_ptr_records != NULL)
+	// 	delete[] m_ptr_records;
+
+	// if (m_p2d_ShortCount > 0)
+	// 	delete[] m_p2d_Short;
+	// if (m_p2d_LongCount > 0)
+	// 	delete[] m_p2d_Long;
+	// if (m_p2d_FloatCount > 0)
+	// 	delete[] m_p2d_Float;
+	// if (m_p2d_DoubleCount > 0)
+	// 	delete[] m_p2d_Double;
+	// if (m_p3d_ShortCount > 0)
+	// 	delete[] m_p3d_Short;
+	// if (m_p3d_LongCount > 0)
+	// 	delete[] m_p3d_Long;
+	// if (m_p3d_FloatCount > 0)
+	// 	delete[] m_p3d_Float;
+	// if (m_p3d_DoubleCount > 0)
+	// 	delete[] m_p3d_Double;
+
 }
 /////////////////////////////////////////////////////////////////////
 short cMap::readSXF(char* p_filename)
@@ -33,103 +92,238 @@ short cMap::readSXF(char* p_filename)
 	return 1;
 }
 /////////////////////////////////////////////////////////////////////
+// short cMap::getPointsSize(long i)
+// {
+// 	if (m_ptr_records[i].is2dPoint())				// Определение размерности метрики (2D/3D)
+// 	{
+// 		if (m_ptr_records[i].isInteger())			// Определение типа данных метрика (Целое/Плав.т.)
+// 		{						
+// 			if(m_ptr_records[i].isShortSize())		// Определение длины типа данных (2-4 байта/4-8 байта)
+// 				return 2*sizeof(short);
+// 			else									// long
+// 				return 2*sizeof(long);
+// 		}
+// 		else 										// Формат плавающей точки
+// 		{
+// 			if(m_ptr_records[i].isShortSize())		// float
+// 				return 2*sizeof(float);
+// 			else 									// double
+// 				return 2*sizeof(double);
+// 		}
+// 	}
+// 	else 											// Метрика в 3D
+// 	{
+// 		if (m_ptr_records[i].isInteger())			// Целый тип
+// 		{
+// 			if(m_ptr_records[i].isShortSize())		// short/float, где float - высота
+// 				return (2*sizeof(short) + sizeof(float));
+// 			else 									// long/float
+// 				return (2*sizeof(long) + sizeof(float));
+// 		}
+// 		else 										// Плавающая точка
+// 		{
+// 			if(m_ptr_records[i].isShortSize())		// float/float
+// 				return 3*sizeof(float);
+// 			else 									// double/double
+// 				return 3*sizeof(double);
+// 		}
+// 	}
+// }
+/////////////////////////////////////////////////////////////////////
 
-void cMap::setPointsType(long i)
+
+
+/////////////////////////////////////////////////////////////////////
+void cMap::calcPointsCount()
 {
-	if (m_ptr_records[i].is2dPoint())				// Определение размерности метрики (2D/3D)
+	m_ptr_passport 		= reinterpret_cast<sPassport*>		(m_ptr_charMap);
+	m_ptr_descriptor 	= reinterpret_cast<sDescriptor*>	(m_ptr_charMap + sizeof(sPassport));
+	m_ptr_headers = new sHeader*[m_ptr_descriptor->recordCount];	
+
+	unsigned long currentPosition;	// Количество байт данных карты, которые
+									// уже были интерпретированы.
+
+	// Первые 452 байта пасспорта и дескриптора уже были интерпретированы:
+	currentPosition = sizeof(sPassport) + sizeof(sDescriptor);
+
+	// Цикл по количеству записей в карте
+	for(unsigned long i = 0; i < m_ptr_descriptor->recordCount; i ++)	
 	{
-		if (m_ptr_records[i].isInteger())			// Определение типа данных метрика (Целое/Плав.т.)
-		{						
-			if(m_ptr_records[i].isShortSize())		// Определение длины типа данных (2-4 B/4-8 B)
-				m_ptr_records[i].pointsType = mType_2dShort;
-			else									// long
-				m_ptr_records[i].pointsType = mType_2dLong;
-		}
-		else 										// Формат плавающей точки
+		m_ptr_headers[i] = reinterpret_cast<sHeader*>	(m_ptr_charMap + currentPosition);
+		if (m_ptr_headers[i]->flag_dimension == 0)				// Определение размерности метрики (2D/3D)
 		{
-			if(m_ptr_records[i].isShortSize())		// float
-				m_ptr_records[i].pointsType = mType_2dFloat;
-			else 									// double
-				m_ptr_records[i].pointsType = mType_2dDouble;
+			if (m_ptr_headers[i]->flag_metricType == 0)			// Определение типа данных метрика (Целое/Плав.т.)
+			{						
+				if(m_ptr_headers[i]->flag_metricSize == 0)		// Определение длины типа данных (2-4 B/4-8 B)
+					m_p2d_ShortCount++;
+				else											// long
+					m_p2d_LongCount++;
+			}
+			else 												// Формат плавающей точки
+			{
+				if(m_ptr_headers[i]->flag_metricSize == 0)		// float
+					m_p2d_FloatCount++;
+				else 											// double
+					m_p2d_DoubleCount++;
+			}
 		}
-	}
-	else 											// Метрика в 3D
-	{
-		if (m_ptr_records[i].isInteger())			// Целый тип
+		else 													// Метрика в 3D
 		{
-			if(m_ptr_records[i].isShortSize())		// short/float, где float - высота
-				m_ptr_records[i].pointsType = mType_3dShort;
-			else 									// long/float
-				m_ptr_records[i].pointsType = mType_3dLong;
+			if (m_ptr_headers[i]->flag_metricType == 0)			// Целый тип
+			{
+				if(m_ptr_headers[i]->flag_metricSize == 0)		// short/float, где float - высота
+					m_p3d_ShortCount++;
+				else 											// long/float
+					m_p3d_LongCount++;
+			}
+			else 												// Плавающая точка
+			{
+				if(m_ptr_headers[i]->flag_metricSize == 0)		// float/float
+					m_p3d_FloatCount++;
+				else 											// double/double
+					m_p3d_DoubleCount++;
+			}
 		}
-		else 										// Плавающая точка
-		{
-			if(m_ptr_records[i].isShortSize())		// float/float
-				m_ptr_records[i].pointsType = mType_3dFloat;
-			else 									// double/double
-				m_ptr_records[i].pointsType = mType_3dDouble;
-		}
+		currentPosition += m_ptr_headers[i]->length;	
 	}
 }
+/////////////////////////////////////////////////////////////////////
+void cMap::AllocMem4Points()
+{
+	if (m_p2d_ShortCount > 0)
+		m_p2d_Short = new s2dPoint<short>*[m_p2d_ShortCount];
+	if (m_p2d_LongCount > 0)
+		m_p2d_Long = new s2dPoint<long>*[m_p2d_LongCount];
+	if (m_p2d_FloatCount > 0)
+		m_p2d_Float = new s2dPoint<float>*[m_p2d_FloatCount];
+	if (m_p2d_DoubleCount > 0)
+		m_p2d_Double = new s2dPoint<double>*[m_p2d_DoubleCount];
+	if (m_p3d_ShortCount > 0)
+		m_p3d_Short = new s3dPoint<short, float>*[m_p3d_ShortCount];
+	if (m_p3d_LongCount > 0)
+		m_p3d_Long = new s3dPoint<long, float>*[m_p3d_LongCount];
+	if (m_p3d_FloatCount > 0)
+		m_p3d_Float = new s3dPoint<float, float>*[m_p3d_FloatCount];
+	if (m_p3d_DoubleCount > 0)
+		m_p3d_Double = new s3dPoint<double, double>*[m_p3d_DoubleCount];
+}
+/////////////////////////////////////////////////////////////////////
+
 
 
 /////////////////////////////////////////////////////////////////////
 void cMap::setPointers()
 {
-	// Паспорт в карте записан первым -> устанавливаем указатель паспотра m_ptr_passport
-	// в начало считанной сырой карты:
-	m_ptr_passport = reinterpret_cast<sPassport*>		(m_ptr_charMap);
-	// Сразу после паспорта записан дескриптор -> устанавливаем указатель дескриптора
-	// в позицию (начала карты + размер паспорта), т.е. после паспорта:
-	m_ptr_descriptor = reinterpret_cast<sDescriptor*>	(m_ptr_charMap + sizeof(sPassport));
-	// В дескрипторе хранится информация о количестве записей карты.
-	// Выделяем место под записи:
-	m_ptr_records = new sRecord[m_ptr_descriptor->recordCount];	
+	// Количество байт данных карты, которые уже были интерпретированы:
+	unsigned long currentPosition = sizeof(sPassport) + sizeof(sDescriptor);
 
-	unsigned long ul_bufPosition;	// Количество байт сырых данных карты, которые
-									// уже были интерпретированы как полезные данные
-
-	// Первые 452 байта пасспорта и дескриптора уже были интерпретированы:
-	ul_bufPosition = sizeof(sPassport) + sizeof(sDescriptor);
+	// Итераторы для заполнения разных массивов метрик:
+	short iter_2dS = 0;
+	short iter_2dL = 0;
+	short iter_2dF = 0;
+	short iter_2dD = 0;
+	short iter_3dS = 0;
+	short iter_3dL = 0;
+	short iter_3dF = 0;
+	short iter_3dD = 0;
 
 	// Цикл по количеству записей в карте
 	for(unsigned long i = 0; i < m_ptr_descriptor->recordCount; i ++)	
 	{
-		m_ptr_records[i].header = reinterpret_cast<sHeader*>	(m_ptr_charMap + ul_bufPosition);
-		m_ptr_records[i].points = 								(m_ptr_charMap + ul_bufPosition + sizeof(sHeader));
-		setPointsType(i); 		// Определям тип точек
+
+
+		if (m_ptr_headers[i]->flag_dimension == 0)				// Определение размерности метрики (2D/3D)
+		{
+			if (m_ptr_headers[i]->flag_metricType == 0)			// Определение типа данных метрика (Целое/Плав.т.)
+			{						
+				if(m_ptr_headers[i]->flag_metricSize == 0)		// Определение длины типа данных (2-4 B/4-8 B)
+					m_p2d_Short[iter_2dS++] = reinterpret_cast<s2dPoint<short>*>(m_ptr_charMap +
+					 currentPosition + sizeof(sHeader));
+				else											// long
+					m_p2d_Long[iter_2dL++] = reinterpret_cast<s2dPoint<long>*>(m_ptr_charMap +
+					 currentPosition + sizeof(sHeader));
+			}
+			else 												// Формат плавающей точки
+			{
+				if(m_ptr_headers[i]->flag_metricSize == 0)		// float
+				{
+					m_p2d_Float[iter_2dF++] = reinterpret_cast<s2dPoint<float>*>(m_ptr_charMap +
+					 currentPosition + sizeof(sHeader));
+					// cout << m_p2d_Float[iter_2dF - 1]->X << "\n";
+				}
+
+				else 											// double
+					m_p2d_Double[iter_2dD++] = reinterpret_cast<s2dPoint<double>*>(m_ptr_charMap +
+					 currentPosition + sizeof(sHeader));
+			}
+		}
+		else 													// Метрика в 3D
+		{
+			if (m_ptr_headers[i]->flag_metricType == 0)			// Целый тип
+			{
+				if(m_ptr_headers[i]->flag_metricSize == 0)		// short/float, где float - высота
+					m_p3d_Short[iter_3dS++] = reinterpret_cast<s3dPoint<short, float>*>(m_ptr_charMap +
+					 currentPosition + sizeof(sHeader));
+				else 											// long/float
+					m_p3d_Long[iter_3dL++] = reinterpret_cast<s3dPoint<long, float>*>(m_ptr_charMap +
+					 currentPosition + sizeof(sHeader));
+			}
+			else 												// Плавающая точка
+			{
+				if(m_ptr_headers[i]->flag_metricSize == 0)		// float/float
+					m_p3d_Float[iter_3dF++] = reinterpret_cast<s3dPoint<float, float>*>(m_ptr_charMap +
+					 currentPosition + sizeof(sHeader));
+				else 											// double/double
+					m_p3d_Double[iter_3dD++] = reinterpret_cast<s3dPoint<double, double>*>(m_ptr_charMap +
+					 currentPosition + sizeof(sHeader));
+			}
+		}
+
 
 		if (m_ptr_records[i].header->subobjectCount > 0)	// Ищем подобъекты если они есть
 		{
-			unsigned long ul_bufPosition4SO = 0;
-			cout << "subObjectCount = " << m_ptr_records[i].header->subobjectCount << "\n";
+			cout << "======Record #" << i << "======\n";
+			// Вылеляем место под subobjectCount указателей:
+			m_ptr_records[i].subobjectPoints = new void*[m_ptr_records[i].header->subobjectCount];
+			 // Определям размер точки (в байтах)
+			short pointsSize = getPointsSize(i);
+
+			// cout << "subObjectCount = " << m_ptr_records[i].header->subobjectCount << "\n";
+			// Сумма размеров метрик подобъектов которые уже интерпретированы как точки:
+			unsigned long subPosition = 0; 
 			for (int j = 0; j < m_ptr_records[i].header->subobjectCount; j++)
 			{
 				cout << "subObject #" << j << "\n";
-				unsigned short* pCount = reinterpret_cast<unsigned short*>(m_ptr_charMap + ul_bufPosition + sizeof(sHeader) + m_ptr_records[i].header->metricPointsCount*2*sizeof(float) + sizeof(short));
+				// указатель на служебное поле, содержащее количество точек подобъекта:				
+				unsigned short* pCount = reinterpret_cast<unsigned short*>
+				(	m_ptr_charMap +		// Указатель на массив с бинарной картой
+					currentPosition + 	// Количество байт, которое уже было прочитано до текущей записи
+					sizeof(sHeader) + 	// Размер заголовка, с которого начиается запись 
+					m_ptr_records[i].header->metricPointsCount*pointsSize +	// Размер метрики записи
+					sizeof(short) + 	// Служебное поле с резервом, которое находится после метрики
+					subPosition);		// Сумма размеров метрик уже пройденных подобъектов
+
+				m_ptr_records[i].subobjectPoints[j] = reinterpret_cast<unsigned short*>
+				(	m_ptr_charMap + 
+				 	currentPosition +
+				 	sizeof(sHeader) +
+				 	m_ptr_records[i].header->metricPointsCount*2*sizeof(float) +
+				 	2*sizeof(short) +	// Служебное поле с резервом + поле с количеством точек
+				 	subPosition);
+
 				cout << "Points count = " << *pCount << "\n";
+
+				// Увеличиваем сетчик на размер всех точек подобъекта + 2 служебных поля с данными о количестве точек
+				subPosition += pointsSize * (*pCount) + 2*sizeof(short); 
 			}
 		}
 		// Увеличваем счетчик интерпретированных байт на размер размер записи
-		ul_bufPosition += m_ptr_records[i].header->length;	
+		currentPosition += m_ptr_headers[i]->length;	
 	}
 	cout << "Pointers was setted\n";
 }
 /////////////////////////////////////////////////////////////////////
 
-
-/////////////////////////////////////////////////////////////////////
-void cMap::readOneRecordMetric(long &p_recordNo, unsigned long &p_bufPosition)
-{
-	if (m_ptr_records[p_recordNo].header->subobjectCount >= 1 )
-	{
-		unsigned short* pCount = reinterpret_cast<unsigned short*>(m_ptr_charMap + p_bufPosition + sizeof(sHeader) + m_ptr_records[p_recordNo].header->metricLenght + sizeof(short));
-		// dec2bin(*pCount);
-		cout << (unsigned long)*pCount;
-		cout << endl;
-	}
-}
-/////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////
@@ -259,12 +453,6 @@ short cMap::writeDescriptorLog(char* p_ptr_filename)
 /////////////////////////////////////////////////////////////////////
 short cMap::writeHeadersLog(char* p_ptr_filename)
 {
-	if (m_ptr_records == NULL)
-	{
-		cout << "ERROR. Records was not read! Headers are not recorded!\n";
-		return -1;
-	}
-
 	ofstream outfile;
 	outfile.open(p_ptr_filename);
 	if (!outfile){	
@@ -273,42 +461,41 @@ short cMap::writeHeadersLog(char* p_ptr_filename)
 		return 0;
 	}
 	for (int i = 0; i < m_ptr_descriptor->recordCount; i++)
-	// for (int i = 0; i < 50; i++)
 	{
 	outfile << "============================================="			 		<< "\n" 
 			<< "Record Header [" 		<< i << "]"								<< "\n"
 			<< "============================================="					<< "\n"	
-	<<	hex	<< "id = "						<< m_ptr_records[i].header->id					<< "\n"
-	<<	dec	<< "length = "					<< m_ptr_records[i].header->length				<< "\n"
-			<< "metricLenght = "			<< m_ptr_records[i].header->metricLenght		<< "\n"
-			<< "classificationCode = "		<< m_ptr_records[i].header->classificationCode	<< "\n\n"
+	<<	hex	<< "id = "						<< m_ptr_headers[i]->id				<< "\n"
+	<<	dec	<< "length = "					<< m_ptr_headers[i]->length			<< "\n"
+			<< "metricLenght = "			<< m_ptr_headers[i]->metricLenght		<< "\n"
+			<< "classificationCode = "		<< m_ptr_headers[i]->classificationCode<< "\n\n"
 
-			<< "numberInGroup = "			<< m_ptr_records[i].header->numberInGroup		<< "\n"
-			<< "groupNumber = "				<< m_ptr_records[i].header->groupNumber			<< "\n\n"
+			<< "numberInGroup = "			<< m_ptr_headers[i]->numberInGroup		<< "\n"
+			<< "groupNumber = "				<< m_ptr_headers[i]->groupNumber		<< "\n\n"
 
-			<< "flag_localization = "		<< m_ptr_records[i].header->flag_localization	<< "\n"
-			<< "flag_frameExit = "			<< m_ptr_records[i].header->flag_frameExit		<< "\n"
-			<< "flag_insularity = "			<< m_ptr_records[i].header->flag_insularity		<< "\n"
-			<< "flag_semantics = "			<< m_ptr_records[i].header->flag_semantics		<< "\n"
-			<< "flag_metricSize = "			<< m_ptr_records[i].header->flag_metricSize	<< "\n"
-			<< "flag_bindingVector = "		<< m_ptr_records[i].header->flag_bindingVector	<< "\n"
-			<< "flag_UNICODE = "			<< m_ptr_records[i].header->flag_UNICODE		<< "\n"
-			<< "flag_reserve = "			<< m_ptr_records[i].header->flag_reserve		<< "\n\n"
+			<< "flag_localization = "		<< m_ptr_headers[i]->flag_localization	<< "\n"
+			<< "flag_frameExit = "			<< m_ptr_headers[i]->flag_frameExit	<< "\n"
+			<< "flag_insularity = "			<< m_ptr_headers[i]->flag_insularity	<< "\n"
+			<< "flag_semantics = "			<< m_ptr_headers[i]->flag_semantics	<< "\n"
+			<< "flag_metricSize = "			<< m_ptr_headers[i]->flag_metricSize	<< "\n"
+			<< "flag_bindingVector = "		<< m_ptr_headers[i]->flag_bindingVector<< "\n"
+			<< "flag_UNICODE = "			<< m_ptr_headers[i]->flag_UNICODE		<< "\n"
+			<< "flag_reserve = "			<< m_ptr_headers[i]->flag_reserve		<< "\n\n"
 
-			<< "flag_metricFormat = "		<< m_ptr_records[i].header->flag_metricFormat	<< "\n"
-			<< "flag_dimension = "			<< m_ptr_records[i].header->flag_dimension		<< "\n"
-			<< "flag_metricType = "		<< m_ptr_records[i].header->flag_metricType	<< "\n"
-			<< "flag_metricText = "			<< m_ptr_records[i].header->flag_metricText		<< "\n"
-			<< "flag_sign = "				<< m_ptr_records[i].header->flag_sign			<< "\n"
-			<< "flag_scalableGraphics = "	<< m_ptr_records[i].header->flag_scalableGraphics<< "\n"
-			<< "flag_metricSpline = "		<< m_ptr_records[i].header->flag_metricSpline	<< "\n\n"
+			<< "flag_metricFormat = "		<< m_ptr_headers[i]->flag_metricFormat	<< "\n"
+			<< "flag_dimension = "			<< m_ptr_headers[i]->flag_dimension	<< "\n"
+			<< "flag_metricType = "			<< m_ptr_headers[i]->flag_metricType	<< "\n"
+			<< "flag_metricText = "			<< m_ptr_headers[i]->flag_metricText	<< "\n"
+			<< "flag_sign = "				<< m_ptr_headers[i]->flag_sign			<< "\n"
+			<< "flag_scalableGraphics = "	<< m_ptr_headers[i]->flag_scalableGraphics<< "\n"
+			<< "flag_metricSpline = "		<< m_ptr_headers[i]->flag_metricSpline	<< "\n\n"
 
-			<< "bottomBorder = "			<< m_ptr_records[i].header->bottomBorder		<< "\n"
-			<< "topBorder = "				<< m_ptr_records[i].header->topBorder			<< "\n\n"
+			<< "bottomBorder = "			<< m_ptr_headers[i]->bottomBorder		<< "\n"
+			<< "topBorder = "				<< m_ptr_headers[i]->topBorder			<< "\n\n"
 
-			<< "metricPointsCountBig = "	<< m_ptr_records[i].header->metricPointsCountBig<< "\n"
-			<< "subobjectNumber = "			<< m_ptr_records[i].header->subobjectCount		<< "\n"
-			<< "metricPointsCount = "		<< m_ptr_records[i].header->metricPointsCount	<< "\n\n";
+			<< "metricPointsCountBig = "	<< m_ptr_headers[i]->metricPointsCountBig<< "\n"
+			<< "subobjectNumber = "			<< m_ptr_headers[i]->subobjectCount	<< "\n"
+			<< "metricPointsCount = "		<< m_ptr_headers[i]->metricPointsCount	<< "\n\n";
 	}
 	cout << "Headers was recored in " << p_ptr_filename << "\n";
 	outfile.close();
@@ -325,114 +512,49 @@ short cMap::writeRecordMetricLog(char* p_ptr_filename)
 		return 0;
 	}
 
+	outfile << "======= 2D SHORT POINTS ========\n"; 
+	for (int i = 0; i < m_p2d_ShortCount; i ++)
+		outfile << m_p2d_Short[i]->X << " - " << m_p2d_Short[i]->Y << "\n";
+	outfile << "======= 2D LONG POINTS ========\n";
+	for (int i = 0; i < m_p2d_LongCount; i ++)
+		outfile << m_p2d_Long[i]->X << " - " << m_p2d_Long[i]->Y << "\n";
+	outfile << "======= 2D FLOAT POINTS ========\n";
+	for (int i = 0; i < m_p2d_FloatCount; i ++)
+		outfile << m_p2d_Float[i]->X << " - " << m_p2d_Float[i]->Y << "\n";
+	outfile << "======= 2D DOUBLE POINTS ========\n";
+	for (int i = 0; i < m_p2d_DoubleCount; i ++)
+		outfile << m_p2d_Double[i]->X << " - " << m_p2d_Double[i]->Y << "\n";
+	outfile << "======= 3D SHORT POINTS ========\n";
+	for (int i = 0; i < m_p3d_ShortCount; i ++)
+		outfile << m_p3d_Short[i]->X << " - " << m_p3d_Short[i]->Y << "\n";
+	outfile << "======= 3D LONG POINTS ========\n";
+	for (int i = 0; i < m_p3d_LongCount; i ++)
+		outfile << m_p3d_Long[i]->X << " - " << m_p3d_Long[i]->Y << "\n";
+	outfile << "======= 3D FLOAT POINTS ========\n";
+	for (int i = 0; i < m_p3d_FloatCount; i ++)
+		outfile << m_p3d_Float[i]->X << " - " << m_p3d_Float[i]->Y << "\n";
+	outfile << "======= 3D DOUBLE POINTS ========\n";
+	for (int i = 0; i < m_p3d_DoubleCount; i ++)
+		outfile << m_p3d_Double[i]->X << " - " << m_p3d_Double[i]->Y << "\n";
 
-	for(unsigned long i = 0; i < m_ptr_descriptor->recordCount; i++) // Цикл по всем записям
-	{
-		// Определение количетва точек в записи: обычное или большое число точек?
-		unsigned long pointsCount;
-		if (m_ptr_records[i].header->metricPointsCount < 65535)		
-			pointsCount = m_ptr_records[i].header->metricPointsCount;
-		else
-			pointsCount = m_ptr_records[i].header->metricPointsCountBig;
 
-		outfile << "==============Metric " << i << " =================\n";
-
-		if (m_ptr_records[i].is2dPoint())						// Определение размерности метрики (2D/3D)
-		{
-			if (m_ptr_records[i].isInteger())					// Определение типа данных метрика (Целое/Плав.т.)
-			{						
-				if(m_ptr_records[i].isShortSize())				// Определение длины типа данных (2-4 B/4-8 B)
-				{
-					//Заменить на функцию!
-					s2dPoint<short>* tmpPoints = reinterpret_cast<s2dPoint<short>*>(m_ptr_records[i].points);
-					for (unsigned long j = 0; j < pointsCount; j++)
-					{
-						outfile << tmpPoints[j].X << 
-						" - " 	<< tmpPoints[j].Y << "\n";
-					}
-				}
-				else											// long
-				{
-					s2dPoint<long>* tmpPoints = reinterpret_cast<s2dPoint<long>*>(m_ptr_records[i].points);
-					for (unsigned long j = 0; j < pointsCount; j++)
-					{
-						outfile << tmpPoints[j].X << 
-						" - " 	<< tmpPoints[j].Y << "\n";
-					}
-				}
-			}
-			else 												// Формат плавающей точки
-			{
-				if(m_ptr_records[i].isShortSize())				// float
-				{
-					s2dPoint<float>* tmpPoints = reinterpret_cast<s2dPoint<float>*>(m_ptr_records[i].points);
-					for (unsigned long j = 0; j < pointsCount; j++)
-					{
-						outfile << tmpPoints[j].X << 
-						" - " 	<< tmpPoints[j].Y << "\n";
-					}
-				}
-				else 											// double
-				{
-					s2dPoint<double>* tmpPoints = reinterpret_cast<s2dPoint<double>*>(m_ptr_records[i].points);
-					for (unsigned long j = 0; j < pointsCount; j++)
-					{
-						outfile << tmpPoints[j].X << 
-						" - " 	<< tmpPoints[j].Y << "\n";
-					}
-					// cout << "i = " << i << "\n";
-				}
-			}
-		}
-		else 		// Метрика в 3D
-		{
-			if (m_ptr_records[i].isInteger())					// Целый тип
-			{
-				if(m_ptr_records[i].isShortSize())				// short/float, где float - высота
-				{
-					s3dPoint<short, float>* tmpPoints = reinterpret_cast<s3dPoint<short, float>*>(m_ptr_records[i].points);
-					for (unsigned long j = 0; j < pointsCount; j++)
-					{
-						outfile << tmpPoints[j].X << 
-						" - " 	<< tmpPoints[j].Y << "\n";
-					}
-				}
-				else 											// long/float
-				{
-					s3dPoint<long, float>* tmpPoints = reinterpret_cast<s3dPoint<long, float>*>(m_ptr_records[i].points);
-					for (unsigned long j = 0; j < pointsCount; j++)
-					{
-						outfile << tmpPoints[j].X << 
-						" - " 	<< tmpPoints[j].Y << "\n";
-					}
-				}
-			}
-			else 												// Плавающая точка
-			{
-				if(m_ptr_records[i].isShortSize())				// float/float
-				{
-					s3dPoint<float, float>* tmpPoints = reinterpret_cast<s3dPoint<float, float>*>(m_ptr_records[i].points);
-					for (unsigned long j = 0; j < pointsCount; j++)
-					{
-						outfile << tmpPoints[j].X << 
-						" - " 	<< tmpPoints[j].Y << "\n";
-					}
-				}
-				else 											// double/double
-				{
-					s3dPoint<float, double>* tmpPoints = reinterpret_cast<s3dPoint<float, double>*>(m_ptr_records[i].points);
-					for (unsigned long j = 0; j < pointsCount; j++)
-					{
-						outfile << tmpPoints[j].X << 
-						" - " 	<< tmpPoints[j].Y << "\n";
-					}
-				}
-			}
-		}
-	}
 
 	cout << "Metric was recored in " << p_ptr_filename << "\n";
 	outfile.close();
 	return 1;
 }
 /////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////
+void cMap::showPCounts()
+{
+	cout 	<< m_p2d_ShortCount		<< "\n"
+			<< m_p2d_LongCount 		<< "\n"
+			<< m_p2d_FloatCount		<< "\n"
+			<< m_p2d_DoubleCount	<< "\n"
+			<< m_p3d_ShortCount		<< "\n"
+			<< m_p3d_LongCount		<< "\n"
+			<< m_p3d_FloatCount		<< "\n"
+			<< m_p3d_DoubleCount	<< "\n";
+}
