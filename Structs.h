@@ -3,7 +3,7 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
-////////////////////////////////////////////////////////////////////
+//=============================Паспорт=============================
 #pragma pack (push, 1)
 struct sPassport	// 400 Bytes
 {
@@ -96,10 +96,10 @@ struct sPassport	// 400 Bytes
 	double 			poleLongitude;					// Долгота полюса
 };
 #pragma pack (pop)
-////////////////////////////////////////////////////////////////////
+//=================================================================
 
 
-////////////////////////////////////////////////////////////////////
+//=============================Дескриптор==========================
 #pragma pack (push, 1)
 struct sDescriptor	// 52 Bytes
 {	
@@ -121,10 +121,10 @@ struct sDescriptor	// 52 Bytes
 	unsigned short	semanticsClassifier;			// Классификатор семантики
 };
 #pragma pack (pop)
-///////////////////////////////////////////////////////////////////
+//=================================================================
 
 
-///////////////////////////////////////////////////////////////////
+//==========================Заголовок записи=======================
 #pragma pack (push, 1)
 struct sHeader		// 32 Bytes
 {
@@ -161,36 +161,149 @@ struct sHeader		// 32 Bytes
 	unsigned short 	metricPointsCount;				// Число точек метрики
 };
 #pragma pack (pop)
-///////////////////////////////////////////////////////////////////
+//=================================================================
 
 
 
 
-///////////////////////////////////////////////////////////////////
-template<class TypeXY>
+//=========================Точки 2D/3D=============================
+template<class XY>
 struct s2dPoint
 {
-	TypeXY X;
-	TypeXY Y;
+	XY X;
+	XY Y;
 };
-///////////////////////////////////////////////////////////////////
-template <class TypeXY, class TypeH>
-struct s3dPoint : s2dPoint<TypeXY>
+
+template <class XY, class H_>
+struct s3dPoint : s2dPoint<XY>
 {
-	TypeH H;
+	H_ H;
 	//
 };
+//================================================================
 
 
 
-template<class pointType>
-struct s2dSubObj
+//=========================Метрики 2D/3D==========================
+template<class XY>
+struct sМetric_2d
 {
-	short* pointsCount;			// Массив с количеством точек для каждого подобъекта
-	short recordNum;			// Номер объекта к которому относится подобъект
-	pointType p2d_Short;		// Массив указателей на метрику подобъекта
+	sHeader* header;			// Указатель на заголовок
+	s2dPoint<XY>* p2d_points;	// Массив указателей на метрику объекта
 };
 
-// enum 	metricTypes {	mType_2dShort, mType_2dLong, mType_2dFloat, mType_2dDouble,
-//  						mType_3dShort, mType_3dLong, mType_3dFloat, mType_3dDouble};
+template<class XY, class H>
+struct sMetric_3d
+{
+	sHeader* header;
+	s3dPoint<XY,H>* p3d_points;	// Массив указателей на метрику подобъекта
+};
+//================================================================
+
+
+
+//===================Метрики подобъектов 2D/3D====================
+template<class XY>
+struct sМetricSO_2d
+{
+	sHeader* header;			// Указатель на заголовок
+	// Массив указателей на количество точек в каждом подобъекте:
+	unsigned short** pointsCount;
+	s2dPoint<XY>** p2d_points;	// Массив указателей на метрики подобъектов
+};
+
+template<class XY, class H>
+struct sMetricSO_3d
+{
+	sHeader* header;				// Указатель на заголовок
+	// Массив указателей на место в памяти с количеством точек для каждого подобъекта:
+	unsigned short** pointsCount;	
+	s3dPoint<XY,H>** p3d_points;	// Массив указателей на метрики подобъектов
+};
+//================================================================
+
+
+
+struct s2dShortSO
+{
+	unsigned short recordNum;				// Номер объекта к которому относятся подобъекты
+	// Массив указателей на место в памяти с количеством точек для каждого подобъекта:
+	unsigned short** pointsCount;			
+	s2dPoint<short>* p2d_points;			// Массив указателей на метрику подобъекта
+};
+
+struct s2dLongSO
+{
+	unsigned short recordNum;				// Номер объекта к которому относятся подобъекты
+	unsigned short** pointsCount;			// Массив с количеством точек для каждого подобъекта
+	s2dPoint<long>* p2d_points;				// Массив указателей на метрику подобъекта
+};
+
+struct s2dFloatSO
+{
+	unsigned short recordNum;				// Номер объекта к которому относятся подобъекты
+	unsigned short** pointsCount;			// Массив с количеством точек для каждого подобъекта
+	s2dPoint<float>* p2d_points;			// Массив указателей на метрику подобъекта
+};
+
+struct s2dDoubleSO
+{
+	unsigned short recordNum;				// Номер объекта к которому относятся подобъекты
+	unsigned short** pointsCount;			// Массив с количеством точек для каждого подобъекта
+	s2dPoint<double>* p2d_points;				// Массив указателей на метрику подобъекта
+};
+
+struct s3dShortSO
+{
+	unsigned short recordNum;				// Номер объекта к которому относятся подобъекты
+	unsigned short** pointsCount;			// Массив с количеством точек для каждого подобъекта
+	s3dPoint<short, float>* p3d_points;				// Массив указателей на метрику подобъекта
+};
+
+struct s3dLongSO
+{
+	unsigned short recordNum;				// Номер объекта к которому относятся подобъекты
+	unsigned short** pointsCount;			// Массив с количеством точек для каждого подобъекта
+	s3dPoint<long, float>* p3d_points;				// Массив указателей на метрику подобъекта
+};
+
+struct s3dFloatSO
+{
+	unsigned short recordNum;				// Номер объекта к которому относятся подобъекты
+	unsigned short** pointsCount;			// Массив с количеством точек для каждого подобъекта
+	s3dPoint<float, float>* p3d_points;				// Массив указателей на метрику подобъекта
+};
+
+struct s3dDoubleSO
+{
+	unsigned short recordNum;				// Номер объекта к которому относятся подобъекты
+	unsigned short** pointsCount;			// Массив с количеством точек для каждого подобъекта
+	s3dPoint<double, double>* p3d_points;				// Массив указателей на метрику подобъекта
+};
+
+// template<template<class> class T>
+// template<class T, template<class> class С = s2dSubObj>
+// struct s2PointSO
+// {
+// 	С<T> p2d_points;
+// };
+
+
+// template<class XY>
+// struct s2dSubObj
+// {
+// 	unsigned short recordNum;				// Номер объекта к которому относятся подобъекты
+// 	unsigned short** pointsCount;			// Массив с количеством точек для каждого подобъекта
+// 	s2dPoint<XY>* p2d_points;				// Массив указателей на метрику подобъекта
+// };
+
+// template<class XY, class H>
+// struct s3dSubObj
+// {
+// 	short* pointsCount;			// Массив с количеством точек для каждого подобъекта
+// 	short recordNum;			// Номер объекта к которому относится подобъект
+// 	s3dPoint<XY,H> p3d_points;	// Массив указателей на метрику подобъекта
+// };
+
+
 #endif
